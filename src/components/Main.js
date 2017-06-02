@@ -2,6 +2,7 @@ require('normalize.css/normalize.css');
 require('styles/App.less');
 
 import React from 'react';
+import ReactDOM from 'react-dom'
 
 
 //获取图片相关数据
@@ -20,19 +21,21 @@ function getRangeRandom(low,high) {
 }
 
 class ImgFigure extends React.Component{
+  constructor(props) {
+    super(props);
+  }
   render(){
     let styleObj = {
 
-    }
+    };
     //如果props属性中指定了位置则使用
-    if(this.props.arrange.pos){
-      styleObj=this.props.arrange.pos;
+    if(this.props.arrage.pos){
+      styleObj=this.props.arrage.pos;
     }
     return(
       <figure className="img-figure" style={styleObj}>
         <img src={this.props.data.imageURL}
-             alt={this.props.data.title}
-        />
+             alt={this.props.data.title}/>
         <figcaption>
           <h2 className="img-title">{this.props.data.title}</h2>
         </figcaption>
@@ -60,10 +63,22 @@ class AppComponent extends React.Component {
         topY:[0,0]
       }
     }
+    this.state = {
+      imgsArrangeArr:[
+        // 	pos:{
+        // 		left:'0',
+        // 		top:'0'
+        // }
+      ]
+    }
   }
-  //重新布局文件
+
+  /*
+   *重新布局所有图片
+   *@param centerIndex 指定居中排布那个图片
+   */
   rearrange(centerIndex){
-   let imgsArrangeArr = this.state.imgsArrangeArr,
+   let  imgsArrangeArr = this.state.imgsArrangeArr,
         Constant = this.Constant,
         centerPos = Constant.centerPos,
         hPosRange = Constant.hPosRange,
@@ -73,14 +88,15 @@ class AppComponent extends React.Component {
         hPosRangeY = hPosRange.y,
         vPosRangeTopY=vPosRange.topY,
         vPosRangeX= vPosRange.x,
+
         imgsArrangeTopArr = [],
-        topImgNum = Math.ceil(Math.random()*2),//取一个或者不取
-        topImgSpliceIndex = 0,
+        topImgNum = Math.ceil(Math.random() * 2),//顶部图片取一个或者不取
+        topImgSpliceIndex  = 0,
         imgsArrageCenterArr = imgsArrangeArr.splice(centerIndex,1);
     //首先居中中心图片
     imgsArrageCenterArr[0].pos= centerPos;
     //取出上侧图片信息
-    topImgSpliceIndex = Math.ceil(Math.random()*(imgArrangeArr.length-topImgNum));
+    topImgSpliceIndex = Math.ceil(Math.random()*(imgsArrangeArr.length-topImgNum));
     imgsArrangeTopArr=imgsArrangeArr.splice(topImgSpliceIndex,topImgNum);
 
     //布局位于上侧的图片
@@ -89,7 +105,7 @@ class AppComponent extends React.Component {
         top: getRangeRandom(vPosRangeTopY[0],vPosRangeTopY[1]),
         left: getRangeRandom(vPosRangeX[0],vPosRangeX[1])
       }
-    })
+    });
     //布局左右两侧图片信息
     for (let i=0,j=imgsArrangeArr.length,k=j/2;i<j;i++){
       let hPosRangeLORX = null;
@@ -113,29 +129,17 @@ class AppComponent extends React.Component {
       imgsArrangeArr:imgsArrangeArr
     });
   }
-  getInitialState(){
-    return{
-      imgsArrangeArr:[
-        /*{
-          pos:{
-            left:'0',
-            top:'0'
-          }
-        }*/
-      ]
-    }
-  }
   //组建加载后计算位置范围
-  componenDidMont(){
+  componentDidMount(){
    //拿到舞台的大小
-    let stageDOM =React.findDOMNode(this.refs.stage),
+    let stageDOM =ReactDOM.findDOMNode(this.refs.stage),
         stageW=stageDOM.scrollWidth,
         stageH=stageDOM.scrollHeight,
         halfStageW=Math.ceil(stageW/2),
-        halfStageH=Math.ceil(stageH/2)
+        halfStageH=Math.ceil(stageH/2);
 
     //拿到一个imagefigure的大小
-    let imgFigureDOM = React.findDOMNode(this.refs.imgFigure0),
+    let imgFigureDOM = ReactDOM.findDOMNode(this.refs.imgFigure0),
         imgW = imgFigureDOM.scrollWidth,
         imgH = imgFigureDOM.scrollHeight,
         halfImgW = Math.ceil(imgW/2),
@@ -173,7 +177,7 @@ class AppComponent extends React.Component {
           },
         }
       }
-      imgFigures.push(<ImgFigure data={value} ref={'imgFigure'+index} arrange={this.state.imgsArrangeArr[index]}/>);
+      imgFigures.push(<ImgFigure data={value} ref={`imgFigure${index}`} arrage={this.state.imgsArrangeArr[index]}/>);
     });
 
     return (
