@@ -72,6 +72,42 @@ class ImgFigure extends React.Component{
     );
   }
 }
+//控制组件
+class ControllerUnit extends React.Component{
+  constructor(props) {
+    super(props);
+    this.handleClick = this.handleClick.bind(this);
+  }
+
+  handleClick(e){
+    //如果点击的是当前正选中态的按钮，翻转图片，否则将对应图片居中
+    if(this.props.arrange.isCenter){
+      this.proos.inverse()
+    }else{
+      this.props.center()
+    }
+    e.stopPropagation();
+    e.preventDefault()
+  }
+
+  render(){
+    let  controlelrUnitClassName = "controller-unit";
+    //如果对应的是居中的图片 显示居中态
+    if(this.props.arrange.isCenter){
+      controlelrUnitClassName += " is-center";
+      //如果同时对应翻转图片， 为翻转态
+      if(this.props.arrange.isInverse){
+        controlelrUnitClassName += " is-inverse";
+      }
+    }
+
+    return (
+      <span className={controlelrUnitClassName} onClick={this.handleClick}> </span>
+    );
+  }
+
+
+}
 
 class AppComponent extends React.Component {
 
@@ -91,7 +127,7 @@ class AppComponent extends React.Component {
         x:[0,0],
         topY:[0,0]
       }
-    }
+    };
     this.state = {
       imgsArrangeArr:[
         // 	pos:{
@@ -145,7 +181,7 @@ class AppComponent extends React.Component {
         vPosRangeX= vPosRange.x,
 
         imgsArrangeTopArr = [],
-        topImgNum = Math.ceil(Math.random() * 2),//顶部图片取一个或者不取
+        topImgNum = Math.floor(Math.random() * 2),//顶部图片取一个或者不取
         topImgSpliceIndex  = 0,
         imgsArrageCenterArr = imgsArrangeArr.splice(centerIndex,1);
     //首先居中中心图片
@@ -249,7 +285,8 @@ class AppComponent extends React.Component {
           isCenter:false
         }
       }
-      imgFigures.push(<ImgFigure data={value} ref={`imgFigure${index}`} arrage={this.state.imgsArrangeArr[index]} inverse={this.inverse(index)} center={this.center(index)}/>);
+      imgFigures.push(<ImgFigure data={value} key={index} ref={`imgFigure${index}`} arrage={this.state.imgsArrangeArr[index]} inverse={this.inverse(index)} center={this.center(index)}/>);
+      controllerUnits.push(<ControllerUnit key={index} arrange={this.state.imgsArrangeArr[index]} inverse={this.inverse(index)} center={this.center(index)}/>);
     });
 
     return (
